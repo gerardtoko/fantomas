@@ -25,4 +25,10 @@ build/Release
 node_modules
 
 # source files
-src
+app
+config
+scripts
+test
+fantomas.js
+logs/*.log
+bin/www.js
