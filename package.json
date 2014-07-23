@@ -1,0 +1,27 @@
+{
+  "name": "fantomas",
+  "version": "0.0.0",
+  "description": "Render a javascript-rendered page as HTML. Alternative to prerender.io",
+  "main": "bin/www.js",
+  "dependencies": {
+    "coffee-script": "^1.7.1",
+    "commander": "^2.3.0",
+    "gulp": "^3.8.6",
+    "gulp-coffee": "^2.1.1",
+    "gulp-util": "^3.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gerardtoko/fantomas.git"
+  },
+  "author": "Gérard TOKO <gerard.toko@gmail.com> (http://www.gerardtoko.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gerardtoko/fantomas/issues"
+  },
+  "homepage": "https://github.com/gerardtoko/fantomas"
+}
