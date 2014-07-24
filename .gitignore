@@ -25,11 +25,11 @@ build/Release
 node_modules
 
 # source files
-app
-config/*.js
-scripts
-test
-fantomas.js
-logs/*.log
-bin/www.js
-config/locale.json
+/app
+/config/*.js
+/scripts
+/test
+/fantomas.js
+/logs/*.log
+/bin/www.js
+/config/locale.json
