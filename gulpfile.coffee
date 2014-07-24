@@ -14,7 +14,7 @@ gulp.task "coffee", ->
 
 # Rerun the task when a file changes
 gulp.task "watch", ->
-  gulp.watch(paths, ["coffee"])
+  gulp.watch paths, ["coffee"]
 
 # The default task (called when you run `gulp` from cli)
-gulp.task("default", ["coffee"]);
+gulp.task "default", ["coffee"]
