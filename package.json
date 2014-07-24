@@ -1,7 +1,7 @@
 {
   "name": "fantomas",
   "version": "0.0.0",
-  "description": "Render a javascript-rendered page crawlable",
+  "description": "Render crawlable your JavaScript app by the search engines",
   "main": "bin/www.js",
   "dependencies": {
     "coffee-script": "^1.7.1",
