@@ -8,24 +8,24 @@ program
   .option '-T, --no-tests', 'ignore test hook'
 
 program
-  .command 'init' 
+  .command 'init'
   .description 'Init configuration'
   .action ->
-    schema = 
+    schema =
       properties:
-        environment: 
+        environment:
           pattern: /(production|development)/
           description: 'Environment (production, development)'
           message: 'Environment must be only production or development'
           type: 'string'
           default: 'development'
-        port: 
+        port:
           pattern: /[0-9]{4}/
           description: 'Port'
           message: 'Port must be Number 3000, 8000'
           type: 'number'
           default: 3000
-        storage: 
+        storage:
           pattern: /(memory|s3|redis)/
           description: 'Storage (memory, s3, redis)'
           message: 'Storage engine must be only memory, s3 or redis'
@@ -37,11 +37,11 @@ program
       environment = options.environment || 'development'
       port = options.port || 3000
       storage = options.storage || 'memory'
-      
+
       nconf.argv()
         .env(environment)
         .file { file: 'config/locale.json' }
-      
+
       nconf.set 'environment', environment
       nconf.set 'port', port
       nconf.set 'storage', storage
