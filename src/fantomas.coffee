@@ -11,7 +11,6 @@ program
   .command 'init' 
   .description 'Init configuration'
   .action ->
-    
     schema = 
       properties:
         environment: 
