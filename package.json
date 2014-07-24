@@ -1,7 +1,7 @@
 {
   "name": "fantomas",
   "version": "0.0.0",
-  "description": "Render a javascript-rendered page as HTML. Alternative to prerender.io",
+  "description": "Render a javascript-rendered page crawlable",
   "main": "bin/www.js",
   "dependencies": {
     "coffee-script": "^1.7.1",
