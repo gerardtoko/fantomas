@@ -103,7 +103,7 @@ program
 
 
 program
-  .command 'set <key> <value>'
+  .command 'config:set <key> <value>'
   .description 'Set configuration'
   .action (key, value)->
     keys = ["port","sitemaps","environment","storage","homepage","APIKey"]
