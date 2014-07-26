@@ -16,6 +16,7 @@ exports.commandGet = (program, messages, regexs) ->
       config = path.resolve('./config/locale_test.json') if options.test
 
       fs.readFile config, (err, data) ->
+        console.log "Currently configuration: ".green
         console.dir JSON.parse(data.toString())
 
 
@@ -28,7 +29,7 @@ exports.commandSet = (program, messages, regexs) ->
 
       config = path.resolve('./config/locale_test.json') if options.test
 
-      keys = ["port","sitemaps","environment","storage","homepage","APIKey"]
+      keys = ["port","sitemaps","storage","homepage","APIKey"]
 
       if key not in keys
         console.log U.format("{0} key isn't available, keys availables ({1})", [key, keys.join ", "]).red
@@ -37,10 +38,6 @@ exports.commandSet = (program, messages, regexs) ->
 
       if key is "port" and not value.match regexs.port
         console.log messages.port.red
-        process.exit 1
-
-      if key is "environment" and not value.match regexs.environment
-        console.log messages.environment.red
         process.exit 1
 
       if key is "storage" and not value.match regexs.storage
@@ -61,4 +58,5 @@ exports.commandSet = (program, messages, regexs) ->
       nconf.set key, value
       nconf.save (err) ->
         fs.readFile path.resolve(config), (err, data) ->
+          console.log "New configuration: ".green
           console.dir JSON.parse(data.toString())

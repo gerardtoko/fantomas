@@ -22,12 +22,6 @@ exports.command = (program, messages, regexs) ->
         prompt.delimiter = ""
         schema =
           properties:
-            environment:
-              pattern: regexs.environment
-              description: 'Environment (production, development)'.white
-              message: messages.environment
-              type: 'string'
-              default: 'development'
             port:
               pattern: regexs.port
               description: 'Port'.white
@@ -68,7 +62,6 @@ exports.command = (program, messages, regexs) ->
             .env()
             .file {file: config}
 
-          nconf.set 'environment', options.environment
           nconf.set 'port', options.port
           nconf.set 'storage', options.storage
           nconf.set 'homepage', options.homepage
@@ -97,7 +90,6 @@ exports.command = (program, messages, regexs) ->
               _deferred.promise
 
             .then (options) ->
-              console.log options
               if options
                 nconf.set 'APIKey', options.APIKey
                 nconf.save deferred.makeNodeResolver()
@@ -120,5 +112,5 @@ exports.command = (program, messages, regexs) ->
 
       .fail (err) ->
         console.log err.message.red if err
-        proccess.exit 1
+        process.exit 1
       .done()

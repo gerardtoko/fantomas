@@ -1,6 +1,7 @@
 program = require 'commander'
 initCommand = require './app/commands/init'
 configCommand = require './app/commands/config'
+crawleCommand = require './app/commands/crawle'
 
 messages =
   environment: "Environment must be only production or development"
@@ -18,9 +19,10 @@ program
   .version '0.0.1'
   .option '-T, --no-tests', 'ignore test hook'
 
-
+#Commands
 initCommand.command program, messages, regexs
 configCommand.commandGet program, messages, regexs
 configCommand.commandSet program, messages, regexs
+crawleCommand.crawleSitemap program, messages, regexs
 
 program.parse process.argv
