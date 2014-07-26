@@ -3,8 +3,10 @@ gutil = require 'gulp-util'
 coffee = require 'gulp-coffee'
 
 paths = [
-  ["./src/*.coffee", "./"]
-  ["./src/app/helpers/*.coffee", "./app/helpers"]
+  ["./src/*.coffee", "./"],
+  ["./src/test/*.coffee", "./test"],
+  ["./src/app/helpers/*.coffee", "./app/helpers"],
+  ["./src/app/commands/*.coffee", "./app/commands"],
 ]
 
 gulp.task "coffee", ->

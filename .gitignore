@@ -33,3 +33,4 @@ node_modules
 /logs/*.log
 /bin/www.js
 /config/locale.json
+/config/locale_test.json
