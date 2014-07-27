@@ -14,6 +14,8 @@ exports.command = (program, messages, regexs) ->
     .option '-T, --test', 'test hook'
     .action (options) ->
 
+      nconf.argv().env().file {file: config}
+
       Q()
       .then ->
         deferred = Q.defer()
@@ -22,34 +24,12 @@ exports.command = (program, messages, regexs) ->
         prompt.delimiter = ""
         schema =
           properties:
-            port:
-              pattern: regexs.port
-              description: 'Port'.white
-              message: messages.port
-              type: 'number'
-              default: 3000
             storage:
               pattern: regexs.storage
-              description: 'Storage (memory)'.white
+              description: 'Storage (memory, redis)'.white
               message: messages.storage
-              type: 'string'
               default: 'memory'
-            homepage:
-              pattern: regexs.homepage
-              description: 'Homepage for the crawling'.white
-              message: messages.homepage
-              type: 'string'
-              required: true
-            sitemaps:
-              description: 'Sitemaps separate by comma'.white
-              type: 'string'
-              default: 'sitemap.xml'
-            generateAPIKey:
-              pattern: /(yes|no)/
-              description: 'Generate API Key ? (yes, no)'.white
-              message: 'answer must be yes or no'
-              type: 'string'
-              default: 'yes'
+              required: false
 
         prompt.start()
         prompt.get schema, deferred.makeNodeResolver()
@@ -58,20 +38,72 @@ exports.command = (program, messages, regexs) ->
       .then (options) ->
         deferred = Q.defer()
         if options
-          nconf.argv()
-            .env()
-            .file {file: config}
 
-          nconf.set 'port', options.port
+          schema =
+            properties:
+              port:
+                pattern: regexs.port
+                description: 'Port'.white
+                message: messages.port
+                type: 'number'
+                default: 3000
+              homepage:
+                pattern: regexs.homepage
+                description: 'Homepage for the crawling'.white
+                message: messages.homepage
+                required: true
+              sitemaps:
+                description: 'Sitemaps separate by comma'.white
+                default: 'sitemap.xml'
+              generateAPIKey:
+                pattern: /^(yes|no)$/
+                description: 'Generate API Key ? (yes, no)'.white
+                message: 'answer must be yes or no'
+                default: 'yes'
+
           nconf.set 'storage', options.storage
+
+          if options.storage is "memory"
+            prompt.start()
+            prompt.get schema, deferred.makeNodeResolver()
+
+          if options.storage is "redis"
+            schemaRedis =
+              properties:
+                port:
+                  pattern: regexs.port
+                  description: 'Redis port'.white
+                  type: 'number'
+                  default: 6379
+                host:
+                  pattern: regexs.redis_host
+                  description: 'Redis host'.white
+                  default: "127.0.0.1"
+            prompt.start()
+            prompt.get schemaRedis, (err, options) ->
+              if options
+                nconf.set 'redis_port', options.port
+                nconf.set 'redis_host', options.host
+                prompt.start()
+                prompt.get schema, deferred.makeNodeResolver()
+              else
+                deferred.reject()
+
+        else
+          deferred.reject()
+        deferred.promise
+
+      .then (options) ->
+        deferred = Q.defer()
+        if options
+          nconf.set 'port', options.port
           nconf.set 'homepage', options.homepage
           nconf.set 'sitemaps', options.sitemaps.split ","
 
           if options.generateAPIKey is 'yes'
             hashid = new hashids options.homepage
             APIKey = hashid.encrypt 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-            nconf.set 'APIKey', APIKey
-            nconf.save deferred.makeNodeResolver()
+            deferred.resolve(APIKey)
           else
             Q()
             .then ->
@@ -82,7 +114,6 @@ exports.command = (program, messages, regexs) ->
                   APIKey:
                     description: 'Entry API Key'.white
                     message: 'You must add the apiKey'
-                    type: 'string'
                     hidden: true
                     required: true
 
@@ -91,8 +122,7 @@ exports.command = (program, messages, regexs) ->
 
             .then (options) ->
               if options
-                nconf.set 'APIKey', options.APIKey
-                nconf.save deferred.makeNodeResolver()
+                deferred.resolve(options.APIKey)
 
             .fail (err) ->
               deferred.reject()
@@ -101,14 +131,21 @@ exports.command = (program, messages, regexs) ->
           deferred.reject()
         deferred.promise
 
+      .then (APIKey) ->
+        deferred = Q.defer()
+        nconf.set 'api_key', APIKey
+        nconf.save deferred.makeNodeResolver()
+        deferred.promise
+
       .then ->
         deferred = Q.defer()
         fs.readFile config, deferred.makeNodeResolver()
         deferred.promise
 
       .then (data) ->
-        console.log "Config file was created: ".green
-        console.dir JSON.parse(data.toString())
+        console.log "Config file was created!".green
+        conf = JSON.parse data.toString()
+        console.log "{0}: {1}".format([k.white, v]) for k, v of conf
 
       .fail (err) ->
         console.log err.message.red if err

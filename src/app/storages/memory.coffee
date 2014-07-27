@@ -5,11 +5,9 @@ cache = require 'memory-cache'
 module.exports = (->
   instance = null;
   storage =
-    init: ->
-      console.log "->".bold.magenta + " Init storage memory"
-    set: (url, html) ->
-      cache.put url, html
-      cache.get url
+    init: -> console.log "->".bold.magenta + " Init Memory storage"
+    get: (url) -> cache.get url
+    set: (url, html) -> cache.put url, html
 
   getInstance: ->
     if instance is null

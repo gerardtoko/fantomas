@@ -18,8 +18,8 @@ exports.crawleSitemap = (program, messages, regexs) ->
     .description 'Load, parse sitemaps and add into storage engine'
     .option '-T, --test', 'test hook'
     .action (options) ->
-
       time = new Date()
+      console.log "Init crawling.".green
 
       Q()
       .then ->
@@ -32,7 +32,7 @@ exports.crawleSitemap = (program, messages, regexs) ->
         for sitemap in sitemaps
           ((sitemap) ->
             sitemapsfn.push (callback) ->
-              console.log "{0} Use sitemap {1}".format(["->".bold.green, sitemap])
+              console.log "{0} Use {1}".format(["->".bold.green, sitemap])
               homepage = nconf.get("homepage").trimRight "/"
               url = if not sitemap.match(regexs.homepage) then "{0}/{1}".format([homepage, sitemap]) else sitemap
 
@@ -75,7 +75,7 @@ exports.crawleSitemap = (program, messages, regexs) ->
                                       pdeferred.resolve()
                               pdeferred.promise
                             .then (result) ->
-                              callback null, result
+                              callback null, {url: url, html: result}
                             .fail (err) ->
                               if err instanceof Error
                                 console.log err.message.red
@@ -98,7 +98,8 @@ exports.crawleSitemap = (program, messages, regexs) ->
 
               .then (results)->
                 storage = storageBase.get nconf.get "storage"
-                storage.set result for result in results when result isnt null
+                storage.set result.url, result.html for result in results when result isnt null
+                console.log "{0} Data inserted in storage".format(["✓".bold.magenta])
                 callback null, sitemap
 
               .fail (err) ->
@@ -115,6 +116,8 @@ exports.crawleSitemap = (program, messages, regexs) ->
         deferred.promise
 
       .then ->
+        s = nconf.get "storage"
+        storageBase.get(s).close() if storageBase.get(s).close
         console.log "Crawling finish.".green
         console.log "Time processing ({0}s).".format([(new Date() - time)/ 1000])
 
