@@ -16,16 +16,18 @@ exports.crawleSitemap = (program, messages, regexs) ->
   program
     .command 'crawle:sitemap'
     .description 'Load, parse sitemaps and add into storage engine'
-    .option '-T, --test', 'test hook'
+    .option '-T, --test', 'Active test hook'
+    .option '-C, --nocolors', 'Disable colors'
     .action (options) ->
       time = new Date()
+      colors.mode = 'none' if options.nocolors
       console.log "Init crawling.".green
+      config = path.resolve('./config/locale_test.json') if options.test
+      nconf.argv().env().file {file: config}
 
       Q()
       .then ->
         deferred = Q.defer()
-        config = path.resolve('./config/locale_test.json') if options.test
-        nconf.argv().env().file {file: config}
         sitemaps = nconf.get "sitemaps"
 
         sitemapsfn = []
@@ -53,8 +55,8 @@ exports.crawleSitemap = (program, messages, regexs) ->
                       console.log "Total URL: #{urls.length}"
                       urlsfn = []
 
-                      urls = [urls[0]]
-                      urls[0].loc = "https://www.google.com"
+                      # urls = [urls[0]]
+                      # urls[0].loc = "https://www.google.com"
                       for url in urls
                         ((url) ->
                           urlsfn.push (callback) ->

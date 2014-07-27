@@ -8,6 +8,7 @@ paths = [
   ["./src/app/helpers/*.coffee", "./app/helpers"]
   ["./src/app/commands/*.coffee", "./app/commands"]
   ["./src/app/storages/*.coffee", "./app/storages"]
+  ["./src/bin/*.coffee", "./bin"]
 ]
 
 gulp.task "coffee", ->

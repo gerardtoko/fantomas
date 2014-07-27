@@ -11,15 +11,16 @@ exports.command = (program, messages, regexs) ->
   program
     .command 'init'
     .description 'Init configuration'
-    .option '-T, --test', 'test hook'
+    .option '-T, --test', 'Active test hook'
+    .option '-C, --nocolors', 'Disable colors'
     .action (options) ->
-
+      colors.mode = 'none' if options.nocolors
+      config = path.resolve('./config/locale_test.json') if options.test
       nconf.argv().env().file {file: config}
 
       Q()
       .then ->
         deferred = Q.defer()
-        config = path.resolve('./config/locale_test.json') if options.test
         prompt.message = ""
         prompt.delimiter = ""
         schema =

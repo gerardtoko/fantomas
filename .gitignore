@@ -26,13 +26,10 @@ node_modules
 
 # source files
 /app
-/config/*.js
 /scripts
 /test
 /fantomas.js
 /logs/*.log
-/bin/www.js
-/config/locale.json
-/config/locale_test.json
-
+/bin/*.js
+/config
 /.npmrc

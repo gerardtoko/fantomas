@@ -11,8 +11,10 @@ exports.commandGet = (program, messages, regexs) ->
   program
     .command 'config:get'
     .description 'Get all configuration'
-    .option '-T, --test', 'test hook'
+    .option '-T, --test', 'Active test hook'
+    .option '-C, --nocolors', 'Disable colors'
     .action (options)->
+      colors.mode = 'none' if options.nocolors
       config = path.resolve('./config/locale_test.json') if options.test
 
       fs.readFile config, (err, data) ->
@@ -25,9 +27,10 @@ exports.commandSet = (program, messages, regexs) ->
   program
     .command 'config:set <key> <value>'
     .description 'Set configuration'
-    .option '-T, --test', 'test hook'
+    .option '-T, --test', 'Active test hook'
+    .option '-C, --nocolors', 'Disable colors'
     .action (key, value, options)->
-
+      colors.mode = 'none' if options.nocolors
       config = path.resolve('./config/locale_test.json') if options.test
       nconf.argv().env().file {file: config}
 

@@ -1,7 +1,7 @@
 program = require 'commander'
-initCommand = require './app/commands/init'
-configCommand = require './app/commands/config'
-crawleCommand = require './app/commands/crawle'
+initCommand = require './../app/commands/init'
+configCommand = require './../app/commands/config'
+crawleCommand = require './../app/commands/crawle'
 
 messages =
   port: 'Port must be a number, Example: 3000 or 8000'
@@ -17,7 +17,6 @@ regexs =
 
 program
   .version '0.0.1'
-  .option '-T, --no-tests', 'ignore test hook'
 
 #Commands
 initCommand.command program, messages, regexs
