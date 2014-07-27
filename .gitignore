@@ -34,3 +34,5 @@ node_modules
 /bin/www.js
 /config/locale.json
 /config/locale_test.json
+
+/.npmrc

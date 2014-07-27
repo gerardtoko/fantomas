@@ -1,19 +1,19 @@
 _ = require('lodash')
 
-String.prototype.trimLeft = (charlist) ->
+String::trimLeft = (charlist) ->
   charlist = "\s" if charlist is undefined;
   this.replace new RegExp("^[" + charlist + "]+"), ""
 
-String.prototype.trimRight = (charlist) ->
+String::trimRight = (charlist) ->
   charlist = "\s" if charlist is undefined;
   this.replace new RegExp("[" + charlist + "]+$"), ""
 
-String.prototype.trim = (charlist) ->
+String::trim = (charlist) ->
   return this.trimLeft(charlist).trimRight(charlist);
 
-String.prototype.format = (args) ->
+String::format = (args) ->
   str = this
-  str.replace String.prototype.format.regex, (item) ->
+  str.replace String::format.regex, (item) ->
     intVal = parseInt item.substring(1, item.length - 1)
     if (intVal >= 0)
       args[intVal]
@@ -23,9 +23,9 @@ String.prototype.format = (args) ->
       "}"
     else
       ""
-String.prototype.format.regex = new RegExp "{-?[0-9]+}", "g"
+String::format.regex = new RegExp "{-?[0-9]+}", "g"
 
-String.prototype.title = () ->
+String::title = () ->
   this.charAt(0).toUpperCase() + this.slice 1;
 
 

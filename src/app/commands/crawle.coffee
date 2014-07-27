@@ -5,6 +5,7 @@ colors = require 'colors'
 Q = require 'Q'
 request = require 'request'
 U = require './../helpers/utils'
+storageBase = require './../storages/base'
 async = require 'async'
 phantom = require 'phantom'
 config = path.resolve './config/locale.json'
@@ -31,7 +32,7 @@ exports.crawleSitemap = (program, messages, regexs) ->
         for sitemap in sitemaps
           ((sitemap) ->
             sitemapsfn.push (callback) ->
-              console.log "Use sitemap {0}.".format([sitemap]).green
+              console.log "{0} Use sitemap {1}".format(["->".bold.green, sitemap])
               homepage = nconf.get("homepage").trimRight "/"
               url = if not sitemap.match(regexs.homepage) then "{0}/{1}".format([homepage, sitemap]) else sitemap
 
@@ -49,24 +50,27 @@ exports.crawleSitemap = (program, messages, regexs) ->
                   if json.urlset
                     if json.urlset.url
                       urls = json.urlset.url
-                      console.log "Total URL: {0}".format([String(urls.length).green])
+                      console.log "Total URL: #{urls.length}"
                       urlsfn = []
+
+                      urls = [urls[0]]
+                      urls[0].loc = "https://www.google.com"
                       for url in urls
                         ((url) ->
                           urlsfn.push (callback) ->
                             Q()
                             .then ->
                               pdeferred = Q.defer()
-                              console.log("{0}: {1}...".format(["Fetch URL".green, url]))
+                              console.log "Fetch URL: #{url}..."
                               phantom.create '--load-images=no', '--local-to-remote-url-access=yes', (ph) ->
                                 ph.createPage (page) ->
                                   page.open url, (status) ->
                                     if status is "success"
                                       page.evaluate (-> document.getElementsByTagName('html')[0].innerHTML), (result) ->
                                         ph.exit()
-                                        pdeferred.resolve(result)
+                                        pdeferred.resolve result
                                     else
-                                      console.log "Error crawling: {0}".format([url]).red
+                                      console.log "{0} crawling: {1}".format(["X".bold, url]).red
                                       ph.exit()
                                       pdeferred.resolve()
                               pdeferred.promise
@@ -78,7 +82,7 @@ exports.crawleSitemap = (program, messages, regexs) ->
                                 console.log err.stack
                               else
                                 console.log err.red
-                              callback(null, null)
+                              callback null
                             .done()
                         )(url.loc)
 
@@ -89,11 +93,13 @@ exports.crawleSitemap = (program, messages, regexs) ->
                     sdeferred.resolve()
 
                 else
-                  sdeferred.reject("Error loading sitemap: {0}".format([url]).red)
+                  sdeferred.reject("{0} Sitemap: {1}".format(["X".bold, url]).red)
                 sdeferred.promise
 
               .then (results)->
-                callback(null, sitemap)
+                storage = storageBase.get nconf.get "storage"
+                storage.set result for result in results when result isnt null
+                callback null, sitemap
 
               .fail (err) ->
                 if err instanceof Error
@@ -101,6 +107,7 @@ exports.crawleSitemap = (program, messages, regexs) ->
                   console.log err.stack
                 else
                   console.log err.red
+                callback null
               .done()
           )(sitemap)
 
@@ -109,7 +116,7 @@ exports.crawleSitemap = (program, messages, regexs) ->
 
       .then ->
         console.log "Crawling finish.".green
-        console.log "Time processing ({0}s).".format([(new Date() - time)/ 1000]).green
+        console.log "Time processing ({0}s).".format([(new Date() - time)/ 1000])
 
       .fail (err) ->
         console.log err.message.red if err
