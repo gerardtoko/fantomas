@@ -6,8 +6,12 @@ module.exports = (->
   instance = null;
   storage =
     init: -> console.log "->".bold.magenta + " Init Memory storage"
-    get: (url) -> cache.get url
-    set: (url, html) -> cache.put url, html
+    get: (url, callback = ->) ->
+      callback null, cache.get url
+
+    set: (url, html, callback = ->) ->
+      cache.put url, html
+      callback null
 
   getInstance: ->
     if instance is null

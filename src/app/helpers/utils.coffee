@@ -1,18 +1,19 @@
 _ = require('lodash')
+hashids = require 'hashids'
 
 String::trimLeft = (charlist) ->
   charlist = "\s" if charlist is undefined;
-  this.replace new RegExp("^[" + charlist + "]+"), ""
+  @replace new RegExp("^[" + charlist + "]+"), ""
 
 String::trimRight = (charlist) ->
   charlist = "\s" if charlist is undefined;
-  this.replace new RegExp("[" + charlist + "]+$"), ""
+  @replace new RegExp("[" + charlist + "]+$"), ""
 
 String::trim = (charlist) ->
-  return this.trimLeft(charlist).trimRight(charlist);
+  return @trimLeft(charlist).trimRight(charlist);
 
 String::format = (args) ->
-  str = this
+  str = @
   str.replace String::format.regex, (item) ->
     intVal = parseInt item.substring(1, item.length - 1)
     if (intVal >= 0)
@@ -26,7 +27,11 @@ String::format = (args) ->
 String::format.regex = new RegExp "{-?[0-9]+}", "g"
 
 String::title = () ->
-  this.charAt(0).toUpperCase() + this.slice 1;
+  @charAt(0).toUpperCase() + @slice 1;
+
+String::hash = () ->
+  hashid = new hashids @
+  hashid.encrypt 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
 
 module.exports =

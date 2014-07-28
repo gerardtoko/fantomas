@@ -1,7 +1,6 @@
 fs = require 'fs'
 nconf = require 'nconf'
 prompt = require 'prompt'
-hashids = require 'hashids'
 path = require 'path'
 colors = require 'colors'
 Q = require 'Q'
@@ -27,7 +26,7 @@ exports.command = (program, messages, regexs) ->
           properties:
             storage:
               pattern: regexs.storage
-              description: 'Storage (memory, redis)'.white
+              description: 'Storage (memory, s3, redis)'.white
               message: messages.storage
               default: 'memory'
               required: false
@@ -77,14 +76,41 @@ exports.command = (program, messages, regexs) ->
                   type: 'number'
                   default: 6379
                 host:
-                  pattern: regexs.redis_host
+                  pattern: regexs.redisHost
                   description: 'Redis host'.white
                   default: "127.0.0.1"
             prompt.start()
             prompt.get schemaRedis, (err, options) ->
               if options
-                nconf.set 'redis_port', options.port
-                nconf.set 'redis_host', options.host
+                nconf.set 'redisPort', options.port
+                nconf.set 'redisHost', options.host
+                prompt.start()
+                prompt.get schema, deferred.makeNodeResolver()
+              else
+                deferred.reject()
+
+          if options.storage is "s3"
+            schemaRedis =
+              properties:
+                s3KeyId:
+                  description: 'S3 accessKeyId'.white
+                  require: true
+                s3SecretKey:
+                  description: 'S3 secretAccessKey'.white
+                  require: true
+                s3Region:
+                  description: 'S3 region'.white
+                  require: true
+                s3Bucket:
+                  description: 'S3 bucket'.white
+                  require: true
+            prompt.start()
+            prompt.get schemaRedis, (err, options) ->
+              if options
+                nconf.set 's3KeyId', options.port
+                nconf.set 's3SecretKey', options.host
+                nconf.set 's3Region', options.port
+                nconf.set 's3Bucket', options.host
                 prompt.start()
                 prompt.get schema, deferred.makeNodeResolver()
               else
@@ -102,9 +128,7 @@ exports.command = (program, messages, regexs) ->
           nconf.set 'sitemaps', options.sitemaps.split ","
 
           if options.generateAPIKey is 'yes'
-            hashid = new hashids options.homepage
-            APIKey = hashid.encrypt 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-            deferred.resolve(APIKey)
+            deferred.resolve(options.homepage.hash())
           else
             Q()
             .then ->
@@ -134,7 +158,7 @@ exports.command = (program, messages, regexs) ->
 
       .then (APIKey) ->
         deferred = Q.defer()
-        nconf.set 'api_key', APIKey
+        nconf.set 'apiKey', APIKey
         nconf.save deferred.makeNodeResolver()
         deferred.promise
 
