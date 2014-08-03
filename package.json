@@ -4,24 +4,25 @@
   "description": "Render crawlable your JavaScript app by the search engines",
   "main": "bin/www.js",
   "dependencies": {
+    "async": "~0.9.0",
+    "aws-sdk": "~2.0.9",
     "coffee-script": "^1.7.1",
+    "colors": "~0.6.2",
     "commander": "^2.3.0",
     "gulp": "^3.8.6",
     "gulp-coffee": "^2.1.1",
     "gulp-util": "^3.0.0",
-    "nconf": "^0.6.9",
     "hashids": "~0.3.3",
     "lodash": "~2.4.1",
-    "colors": "~0.6.2",
-    "shelljs": "~0.3.0",
+    "memory-cache": "0.0.5",
+    "nconf": "^0.6.9",
+    "phantom": "~0.6.5",
     "prompt": "~0.2.13",
     "q": "~1.0.1",
-    "request": "~2.39.0",
-    "async": "~0.9.0",
-    "phantom": "~0.6.5",
-    "memory-cache": "0.0.5",
     "redis": "~0.11.0",
-    "aws-sdk": "~2.0.9"
+    "request": "~2.39.0",
+    "shelljs": "~0.3.0",
+    "xml2json": "^0.4.0"
   },
   "devDependencies": {
     "mocha": "~1.21.0"
