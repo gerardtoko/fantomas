@@ -55,8 +55,8 @@ exports.crawleSitemap = (program, messages, regexs) ->
                       console.log "Total URL: #{urls.length}"
                       urlsfn = []
 
-                      urls = [urls[0]]
-                      urls[0].loc = "https://www.google.com"
+                      # urls = [urls[0]]
+                      # urls[0].loc = "https://www.google.com"
                       for url in urls
                         ((url) ->
                           urlsfn.push (callback) ->

@@ -8,6 +8,7 @@ paths = [
   ["./src/app/helpers/*.coffee", "./app/helpers"]
   ["./src/app/commands/*.coffee", "./app/commands"]
   ["./src/app/storages/*.coffee", "./app/storages"]
+  ["./src/app/routes/*.coffee", "./app/routes"]
   ["./src/bin/*.coffee", "./bin"]
 ]
 
