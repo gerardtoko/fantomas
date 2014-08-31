@@ -20,8 +20,8 @@ exports.command = (program, messages, regexs) ->
       Q()
       .then ->
         deferred = Q.defer()
-        prompt.message = ""
-        prompt.delimiter = ""
+        prompt.message = ''
+        prompt.delimiter = ''
         schema =
           properties:
             storage:
@@ -63,11 +63,11 @@ exports.command = (program, messages, regexs) ->
 
           nconf.set 'storage', options.storage
 
-          if options.storage is "memory"
+          if options.storage is 'memory'
             prompt.start()
             prompt.get schema, deferred.makeNodeResolver()
 
-          if options.storage is "redis"
+          if options.storage is 'redis'
             schemaRedis =
               properties:
                 port:
@@ -78,7 +78,7 @@ exports.command = (program, messages, regexs) ->
                 host:
                   pattern: regexs.redisHost
                   description: 'Redis host'.white
-                  default: "127.0.0.1"
+                  default: '127.0.0.1'
             prompt.start()
             prompt.get schemaRedis, (err, options) ->
               if options
@@ -89,7 +89,7 @@ exports.command = (program, messages, regexs) ->
               else
                 deferred.reject()
 
-          if options.storage is "s3"
+          if options.storage is 's3'
             schemaRedis =
               properties:
                 s3KeyId:
@@ -125,7 +125,7 @@ exports.command = (program, messages, regexs) ->
         if options
           nconf.set 'port', options.port
           nconf.set 'homepage', options.homepage
-          nconf.set 'sitemaps', options.sitemaps.split ","
+          nconf.set 'sitemaps', options.sitemaps.split ','
 
           if options.generateAPIKey is 'yes'
             deferred.resolve(options.homepage.hash())
@@ -168,9 +168,9 @@ exports.command = (program, messages, regexs) ->
         deferred.promise
 
       .then (data) ->
-        console.log "Config file was created!".green
+        console.log 'Config file was created!'.green
         conf = JSON.parse data.toString()
-        console.log "{0}: {1}".format([k.white, v]) for k, v of conf
+        console.log U.format('{0}: {1}', [k.white, v]) for k, v of conf
 
       .fail (err) ->
         console.log err.message.red if err

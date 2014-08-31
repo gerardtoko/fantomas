@@ -1,4 +1,4 @@
 
 module.exports =
   get: (name) ->
-    require("./#{name}").getInstance()
+    require('./#{name}').getInstance()

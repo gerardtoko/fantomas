@@ -13,9 +13,14 @@ paths = [
 ]
 
 gulp.task "coffee", ->
+  errFn = (err)->
+    console.log err.toString()
+    gulp.src err.filename
+      .pipe notify err.toString()
+
   for path in paths
     gulp.src(path[0])
-      .pipe(coffee({bare: true}).on("error", gutil.log))
+      .pipe(coffee({bare: true}).on('error', errFn))
       .pipe(gulp.dest(path[1]))
 
 

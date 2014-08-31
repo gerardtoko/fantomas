@@ -10,9 +10,9 @@ module.exports = (->
   instance = null;
   storage =
     init: ->
-      console.log "->".bold.magenta + " Init Redis storage"
+      console.log '->'.bold.magenta + ' Init Redis storage'
       nconf.argv().env().file {file: config}
-      @client = redis.createClient(nconf.get("redisPort"), nconf.get("redisHost"))
+      @client = redis.createClient(nconf.get('redisPort'), nconf.get('redisHost'))
 
     get: (url, callback = ->) ->
       @client.get url, (err, html) ->

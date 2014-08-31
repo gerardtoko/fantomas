@@ -10,6 +10,8 @@ async = require 'async'
 phantom = require 'phantom'
 config = path.resolve './config/locale.json'
 parser = require 'xml2json'
+_ = require 'lodash'
+_.str = require 'underscore.string'
 
 
 exports.crawleSitemap = (program, messages, regexs) ->
@@ -21,22 +23,22 @@ exports.crawleSitemap = (program, messages, regexs) ->
     .action (options) ->
       time = new Date()
       colors.mode = 'none' if options.nocolors
-      console.log "Init crawling.".green
+      console.log 'Init crawling.'.green
       config = path.resolve('./config/locale_test.json') if options.test
       nconf.argv().env().file {file: config}
 
       Q()
       .then ->
         deferred = Q.defer()
-        sitemaps = nconf.get "sitemaps"
+        sitemaps = nconf.get 'sitemaps'
 
         sitemapsfn = []
         for sitemap in sitemaps
           ((sitemap) ->
             sitemapsfn.push (callback) ->
-              console.log "{0} Use {1}".format(["->".bold.green, sitemap])
-              homepage = nconf.get("homepage").trimRight "/"
-              url = if not sitemap.match(regexs.homepage) then "{0}/{1}".format([homepage, sitemap]) else sitemap
+              console.log U.format('{0} Use {1}', ['->'.bold.green, sitemap])
+              homepage = _.str.rtrim nconf.get('homepage'), '/'
+              url = if not sitemap.match(regexs.homepage) then U.format('{0}/{1}', [homepage, sitemap]) else sitemap
 
               Q()
               .then ->
@@ -52,27 +54,27 @@ exports.crawleSitemap = (program, messages, regexs) ->
                   if json.urlset
                     if json.urlset.url
                       urls = json.urlset.url
-                      console.log "Total URL: #{urls.length}"
+                      console.log 'Total URL: #{urls.length}'
                       urlsfn = []
 
                       # urls = [urls[0]]
-                      # urls[0].loc = "https://www.google.com"
+                      # urls[0].loc = 'https://www.google.com'
                       for url in urls
                         ((url) ->
                           urlsfn.push (callback) ->
                             Q()
                             .then ->
                               pdeferred = Q.defer()
-                              console.log "Fetch URL: #{url}..."
+                              console.log 'Fetch URL: #{url}...'
                               phantom.create '--load-images=no', '--local-to-remote-url-access=yes', (ph) ->
                                 ph.createPage (page) ->
                                   page.open url, (status) ->
-                                    if status is "success"
+                                    if status is 'success'
                                       page.evaluate (-> document.getElementsByTagName('html')[0].innerHTML), (result) ->
                                         ph.exit()
                                         pdeferred.resolve result
                                     else
-                                      console.log "{0} crawling: {1}".format(["X".bold, url]).red
+                                      console.log U.format('{0} crawling: {1}', ['X'.bold, url]).red
                                       ph.exit()
                                       pdeferred.resolve()
                               pdeferred.promise
@@ -95,13 +97,13 @@ exports.crawleSitemap = (program, messages, regexs) ->
                     sdeferred.resolve()
 
                 else
-                  sdeferred.reject("{0} Sitemap: {1}".format(["X".bold, url]).red)
+                  sdeferred.reject(U.format('{0} Sitemap: {1}', ['X'.bold, url]).red)
                 sdeferred.promise
 
               .then (results)->
-                storage = storageBase.get nconf.get "storage"
+                storage = storageBase.get nconf.get 'storage'
                 storage.set result.url, result.html for result in results when result isnt null
-                console.log "{0} Data inserted in storage".format(["✓".bold.magenta])
+                console.log U.format('{0} Data inserted in storage', ['✓'.bold.magenta])
                 callback null, sitemap
 
               .fail (err) ->
@@ -118,10 +120,10 @@ exports.crawleSitemap = (program, messages, regexs) ->
         deferred.promise
 
       .then ->
-        s = nconf.get "storage"
+        s = nconf.get 'storage'
         storageBase.get(s).close() if storageBase.get(s).close
-        console.log "Crawling finish.".green
-        console.log "Time processing ({0}s).".format([(new Date() - time)/ 1000])
+        console.log 'Crawling finish.'.green
+        console.log U.format('Time processing ({0}s).', [(new Date() - time)/ 1000])
 
       .fail (err) ->
         console.log err.message.red if err

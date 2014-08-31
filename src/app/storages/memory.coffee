@@ -5,7 +5,7 @@ cache = require 'memory-cache'
 module.exports = (->
   instance = null;
   storage =
-    init: -> console.log "->".bold.magenta + " Init Memory storage"
+    init: -> console.log '->'.bold.magenta + ' Init Memory storage'
     get: (url, callback = ->) ->
       callback null, cache.get url
 
