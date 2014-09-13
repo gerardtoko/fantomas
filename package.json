@@ -6,11 +6,16 @@
   "dependencies": {
     "async": "~0.9.0",
     "aws-sdk": "~2.0.9",
+    "body-parser": "~1.0.0",
     "colors": "~0.6.2",
     "commander": "^2.3.0",
+    "cookie-parser": "~1.0.1",
+    "express": "~4.2.0",
+    "gulp": "^3.8.8",
     "hashids": "~0.3.3",
     "lodash": "~2.4.1",
     "memory-cache": "0.0.5",
+    "morgan": "~1.0.0",
     "nconf": "^0.6.9",
     "phantom": "~0.6.5",
     "prompt": "~0.2.13",
@@ -18,25 +23,21 @@
     "redis": "~0.11.0",
     "request": "~2.39.0",
     "shelljs": "~0.3.0",
-    "xml2json": "^0.4.0",
-    "express": "~4.2.0",
     "static-favicon": "~1.0.0",
-    "morgan": "~1.0.0",
-    "cookie-parser": "~1.0.1",
-    "body-parser": "~1.0.0",
-    "underscore.string": "~2.3.3"
+    "underscore.string": "~2.3.3",
+    "xml2json": "^0.4.0"
   },
   "devDependencies": {
     "coffee-script": "^1.7.1",
-    "gulp": "^3.8.6",
+    "gulp": "^3.8.8",
     "gulp-coffee": "^2.1.1",
+    "gulp-notify": "~1.5.0",
     "gulp-util": "^3.0.0",
-    "mocha": "~1.21.0",
-    "gulp-notify": "~1.5.0"
+    "mocha": "~1.21.0"
   },
   "scripts": {
     "global": "npm install -g phantomjs gulp coffee-script",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",

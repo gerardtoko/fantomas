@@ -1,4 +1,5 @@
+U = require './../helpers/utils'
 
 module.exports =
   get: (name) ->
-    require('./#{name}').getInstance()
+    require(U.format './{0}', [name]).getInstance()
