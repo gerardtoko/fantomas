@@ -32,91 +32,84 @@ exports.crawleSitemap = (program, messages, regexs) ->
         deferred = Q.defer()
         sitemaps = nconf.get 'sitemaps'
 
-        sitemapsfn = []
-        for sitemap in sitemaps
-          ((sitemap) ->
-            sitemapsfn.push (callback) ->
-              console.log U.format('{0} Use {1}', ['->'.bold.green, sitemap])
-              homepage = _.str.rtrim nconf.get('homepage'), '/'
-              url = if not sitemap.match(regexs.homepage) then U.format('{0}/{1}', [homepage, sitemap]) else sitemap
+        sitemapsfn = (sitemap, callback) ->
+          console.log U.format('{0} Use {1}', ['->'.bold.green, sitemap])
+          homepage = _.str.rtrim nconf.get('homepage'), '/'
+          url = if not sitemap.match(regexs.homepage) then U.format('{0}/{1}', [homepage, sitemap]) else sitemap
 
-              Q()
-              .then ->
-                sdeferred = Q.defer()
-                request url, sdeferred.makeNodeResolver()
-                sdeferred.promise
+          Q()
+          .then ->
+            sdeferred = Q.defer()
+            request url, sdeferred.makeNodeResolver()
+            sdeferred.promise
 
-              .then (data) ->
-                sdeferred = Q.defer()
-                if data[0].statusCode is 200
-                  json = JSON.parse(parser.toJson(data[1]))
+          .then (data) ->
+            sdeferred = Q.defer()
+            if data[0].statusCode is 200
+              json = JSON.parse(parser.toJson(data[1]))
 
-                  if json.urlset
-                    if json.urlset.url
-                      urls = json.urlset.url
-                      console.log 'Total URL: #{urls.length}'
-                      urlsfn = []
-
-                      # urls = [urls[0]]
-                      # urls[0].loc = 'https://www.google.com'
-                      for url in urls
-                        ((url) ->
-                          urlsfn.push (callback) ->
-                            Q()
-                            .then ->
-                              pdeferred = Q.defer()
-                              console.log 'Fetch URL: #{url}...'
-                              phantom.create '--load-images=no', '--local-to-remote-url-access=yes', (ph) ->
-                                ph.createPage (page) ->
-                                  page.open url, (status) ->
-                                    if status is 'success'
-                                      page.evaluate (-> document.getElementsByTagName('html')[0].innerHTML), (result) ->
-                                        ph.exit()
-                                        pdeferred.resolve result
-                                    else
-                                      console.log U.format('{0} crawling: {1}', ['X'.bold, url]).red
-                                      ph.exit()
-                                      pdeferred.resolve()
-                              pdeferred.promise
-                            .then (result) ->
-                              callback null, {url: url, html: result}
-                            .fail (err) ->
-                              if err instanceof Error
-                                console.log err.message.red
-                                console.log err.stack
-                              else
-                                console.log err.red
-                              callback null
-                            .done()
-                        )(url.loc)
-
-                      async.series urlsfn, sdeferred.makeNodeResolver()
-                    else
-                      sdeferred.resolve()
-                  else
-                    sdeferred.resolve()
-
+              if json.urlset
+                if json.urlset.url
+                  urls = json.urlset.url
+                  console.log U.format 'Total URL: {0}', [urls.length]
+                  # urls = [urls[0]]
+                  # urls[0].loc = 'https://www.google.com'
+                  
+                  urlsfn = (url, callback) ->
+                    url = url.loc
+                    Q()
+                    .then ->
+                      pdeferred = Q.defer()
+                      console.log U.format 'Fetch URL: {0}...', [url]
+                      phantom.create '--load-images=no', '--local-to-remote-url-access=yes', (ph) ->
+                        ph.createPage (page) ->
+                          page.open url, (status) ->
+                            if status is 'success'
+                              page.evaluate (-> document.getElementsByTagName('html')[0].innerHTML), (result) ->
+                                ph.exit()
+                                pdeferred.resolve result
+                            else
+                              console.log U.format('{0} crawling: {1}', ['X'.bold, url]).red
+                              ph.exit()
+                              pdeferred.resolve()
+                      pdeferred.promise
+                    .then (result) ->
+                      callback null, {url: url, html: result}
+                    .fail (err) ->
+                      if err instanceof Error
+                        console.log err.message.red
+                        console.log err.stack
+                      else
+                        console.log err.red
+                      callback null
+                    .done()
+                  async.mapSeries urls, urlsfn, sdeferred.makeNodeResolver()
                 else
-                  sdeferred.reject(U.format('{0} Sitemap: {1}', ['X'.bold, url]).red)
-                sdeferred.promise
+                  sdeferred.resolve()
+              else
+                sdeferred.resolve()
 
-              .then (results)->
-                storage = storageBase.get nconf.get 'storage'
-                storage.set result.url, result.html for result in results when result isnt null
-                console.log U.format('{0} Data inserted in storage', ['✓'.bold.magenta])
-                callback null, sitemap
+            else
+              sdeferred.reject(U.format('{0} Sitemap: {1}', ['X'.bold, url]).red)
+            sdeferred.promise
 
-              .fail (err) ->
-                if err instanceof Error
-                  console.log err.message.red
-                  console.log err.stack
-                else
-                  console.log err.red
-                callback null
-              .done()
-          )(sitemap)
+          .then (results)->
+            storageName = nconf.get 'storage'
+            storage = storageBase.get storageName
+            storage.set result.url, result.html for result in results when result isnt null
+            console.log U.format('{0} Data inserted in {1} storage', ['✓'.bold.magenta, storageName])
+            callback null, sitemap
 
-        async.series sitemapsfn, deferred.makeNodeResolver()
+          .fail (err) ->
+            if err instanceof Error
+              console.log err.message.red
+              console.log err.stack
+            else
+              console.log err.red
+            callback null
+          .done()
+
+        async.eachSeries sitemaps, sitemapsfn, deferred.makeNodeResolver()
         deferred.promise
 
       .then ->

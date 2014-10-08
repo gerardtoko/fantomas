@@ -73,24 +73,9 @@ exports.commandSet = (program, messages, regexs) ->
         console.log messages.redisHost.red
         process.exit 1
 
-      if key is 'storage' and value is 'redis'
-        if (not nconf.get 'redisPort') or (not nconf.get 'redisHost')
-          console.log 'You must configure the port and host for redis!'.yellow
-          console.log '-> '.bold.yellow + 'node fantomas config:set redisPort 6379'.yellow
-          console.log '-> '.bold.yellow + 'node fantomas config:set redisHost localhost'.yellow
-
-      if key is 'storage' and value is 's3'
-        if (not nconf.get 's3KeyId') or (not nconf.get 's3SecretKey') or (not nconf.get 's3Region') or (not nconf.get 's3Bucket')
-          console.log 'You must configure the keyId, secretKey, region and bucket for s3'.yellow
-          console.log '-> '.bold.yellow + 'node fantomas config:set s3KeyId akid'.yellow
-          console.log '-> '.bold.yellow + 'node fantomas config:set s3SecretKey secret'.yellow
-          console.log '-> '.bold.yellow + 'node fantomas config:set s3Region us-west-2'.yellow
-          console.log '-> '.bold.yellow + 'node fantomas config:set s3Bucket myBucket'.yellow
-
       value = value.split ',' if key is 'sitemaps'
       value = Number value if key is 'port'
       value = Number value if key is 'redisPort'
-
 
       nconf.set key, value
       nconf.save (err) ->
@@ -98,3 +83,18 @@ exports.commandSet = (program, messages, regexs) ->
           console.log 'New configuration: '.green
           conf = JSON.parse data.toString()
           console.log U.format('{0}: {1}', [k.white, v]) for k, v of conf
+
+          if key is 'storage' and value is 'redis'
+            if (not nconf.get 'redisPort') or (not nconf.get 'redisHost')
+              console.log 'You must configure the port and host for redis!'.yellow
+              console.log '-> '.bold.yellow + 'node bin/fantomas config:set redisPort 6379'.yellow
+              console.log '-> '.bold.yellow + 'node bin/fantomas config:set redisHost localhost'.yellow
+
+          if key is 'storage' and value is 's3'
+            if (not nconf.get 's3KeyId') or (not nconf.get 's3SecretKey') or (not nconf.get 's3Region') or (not nconf.get 's3Bucket')
+              console.log 'You must configure the keyId, secretKey, region and bucket for s3'.yellow
+              console.log '-> '.bold.yellow + 'node bin/fantomas config:set s3KeyId akid'.yellow
+              console.log '-> '.bold.yellow + 'node bin/fantomas config:set s3SecretKey secret'.yellow
+              console.log '-> '.bold.yellow + 'node bin/fantomas config:set s3Region us-west-2'.yellow
+              console.log '-> '.bold.yellow + 'node bin/fantomas config:set s3Bucket myBucket'.yellow
+
