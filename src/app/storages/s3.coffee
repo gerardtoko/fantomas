@@ -12,31 +12,22 @@ module.exports = (->
     init: ->
       console.log '->'.bold.magenta + ' Init S3 storage'
       nconf.argv().env().file {file: config}
-      AWS.config {
-        'accessKeyId': nconf.get('s3KeyId'),
-        'secretAccessKey': nconf.get('s3SecretKey'),
-        'region': nconf.get('s3Region'),
+      AWS.config.update {
+        'accessKeyId': nconf.get 's3KeyId'
+        'secretAccessKey': nconf.get 's3SecretKey'
+        'region': nconf.get 's3Region'
       }
       @s3 = new AWS.S3()
       nconf.argv().env().file {file: config}
       @bucket = nconf.get 's3Bucket'
 
     get: (url, callback = ->) ->
-      params = {Bucket: @bucket, Key: url.hash()}
-      @s3.getObject params, (err, html) ->
-        if err
-          callback err
-        else
-          callback null, html
-
+      params = Bucket: @bucket, Key: U.hash(url)
+      @s3.getObject params, (err, data) -> callback err, data
 
     set: (url, html, callback = ->) ->
-      params = {Bucket: @bucket, Key: url.hash(), Body: html}
-      @s3.putObject params, (err, data) ->
-        if err
-          callback err
-        else
-          callback null, data
+      params = Bucket: @bucket, Key: U.hash(url), Body: html
+      @s3.putObject params, (err, data) -> callback err, data
 
   getInstance: ->
     if instance is null

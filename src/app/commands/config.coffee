@@ -38,7 +38,6 @@ exports.commandSet = (program, messages, regexs) ->
         'port',
         'sitemaps'
         'storage'
-        'homepage'
         'apiKey'
         'redisPort'
         'redisHost'
@@ -63,10 +62,6 @@ exports.commandSet = (program, messages, regexs) ->
 
       if key is 'storage' and not value.match regexs.storage
         console.log messages.storage.red
-        process.exit 1
-
-      if key is 'homepage' and not value.match regexs.homepage
-        console.log messages.homepage.red
         process.exit 1
 
       if key is 'redisHost' and not value.match regexs.redisHost

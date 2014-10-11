@@ -1,5 +1,6 @@
 hashids = require 'hashids'
 crypto = require 'crypto'
+uuid = require('node-uuid')
 
 module.exports =
   format: (str, args) ->
@@ -26,6 +27,7 @@ module.exports =
       return str
 
   hash: (str) ->
-    _str = crypto.createHash('md5').update(str).digest('hex')
+    str  = str || do uuid.v1
+    _str = crypto.createHash('md5').update(str).digest 'hex'
     hashid = new hashids _str
     hashid.encrypt 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
