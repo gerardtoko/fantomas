@@ -18,7 +18,6 @@ module.exports = (->
         'region': nconf.get 's3Region'
       }
       @s3 = new AWS.S3()
-      nconf.argv().env().file {file: config}
       @bucket = nconf.get 's3Bucket'
 
     get: (url, callback = ->) ->
