@@ -34,13 +34,10 @@ exports.crawleSitemap = (program, messages, regexs) ->
 
         sitemapsfn = (sitemap, callback) ->
           console.log U.format('{0} Use {1}', ['->'.bold.green, sitemap])
-          homepage = _.str.rtrim nconf.get('homepage'), '/'
-          url = if not sitemap.match(regexs.homepage) then U.format('{0}/{1}', [homepage, sitemap]) else sitemap
-
           Q()
           .then ->
             sdeferred = Q.defer()
-            request url, sdeferred.makeNodeResolver()
+            request sitemap, sdeferred.makeNodeResolver()
             sdeferred.promise
 
           .then (data) ->
@@ -51,10 +48,10 @@ exports.crawleSitemap = (program, messages, regexs) ->
               if json.urlset
                 if json.urlset.url
                   urls = json.urlset.url
-                  console.log U.format 'Total URL: {0}', [urls.length]
+                  console.log U.format 'Total URL: {0}', [String(urls.length).green]
                   # urls = [urls[0]]
                   # urls[0].loc = 'https://www.google.com'
-                  
+
                   urlsfn = (url, callback) ->
                     url = url.loc
                     Q()

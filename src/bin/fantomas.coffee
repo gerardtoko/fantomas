@@ -6,13 +6,13 @@ crawleCommand = require './../app/commands/crawle'
 messages =
   port: 'Port must be a number, Example: 3000 or 8000'
   storage: 'Storage engine must be only memory, redis or s3'
-  homepage: 'Your homepage must be valid url, Example: http://example.com'
+  sitemap: 'Your sitemaps must be valid url, Example: http://example.com/sitemap.xml'
   redisHost: 'Invalid host for Redis host'
 
 regexs =
   port: /^[0-9]{4}$/
   storage: /^(memory|redis)$/
-  homepage: /^((http|https):\/\/)(www[.])?([a-zA-Z0-9]|-)+([.][a-zA-Z0-9(-|\/|=|?)?]+)+$/
+  sitemap: /^((http|https):\/\/)(www[.])?([a-zA-Z0-9]|-)+([.][a-zA-Z0-9(-|\/|=|?)?]+)+$/
   redisHost: /^[a-zA-Z0-9.-]{1,}$/
 
 program

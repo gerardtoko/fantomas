@@ -4,6 +4,7 @@ prompt = require 'prompt'
 path = require 'path'
 colors = require 'colors'
 Q = require 'Q'
+U = require './../helpers/utils'
 config = path.resolve './config/locale.json'
 
 exports.command = (program, messages, regexs) ->
@@ -47,11 +48,6 @@ exports.command = (program, messages, regexs) ->
                 message: messages.port
                 type: 'number'
                 default: 3000
-              homepage:
-                pattern: regexs.homepage
-                description: 'Homepage for the crawling'.white
-                message: messages.homepage
-                required: true
               sitemaps:
                 description: 'Sitemaps separate by comma'.white
                 default: 'sitemap.xml'
@@ -124,11 +120,10 @@ exports.command = (program, messages, regexs) ->
         deferred = Q.defer()
         if options
           nconf.set 'port', options.port
-          nconf.set 'homepage', options.homepage
           nconf.set 'sitemaps', options.sitemaps.split ','
 
           if options.generateAPIKey is 'yes'
-            deferred.resolve(options.homepage.hash())
+            deferred.resolve do U.hash
           else
             Q()
             .then ->
