@@ -33,3 +33,4 @@ node_modules
 /bin/*.js
 /config
 /.npmrc
+/src/test/commands_crawle_secret.coffee

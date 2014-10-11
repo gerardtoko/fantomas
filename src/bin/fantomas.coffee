@@ -11,7 +11,7 @@ messages =
 
 regexs =
   port: /^[0-9]{4}$/
-  storage: /^(memory|redis)$/
+  storage: /^(memory|redis|s3)$/
   sitemap: /^((http|https):\/\/)(www[.])?([a-zA-Z0-9]|-)+([.][a-zA-Z0-9(-|\/|=|?)?]+)+$/
   redisHost: /^[a-zA-Z0-9.-]{1,}$/
 

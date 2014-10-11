@@ -48,10 +48,10 @@ exports.crawleSitemap = (program, messages, regexs) ->
               if json.urlset
                 if json.urlset.url
                   urls = json.urlset.url
-                  console.log U.format 'Total URL: {0}', [String(urls.length).green]
-                  # urls = [urls[0]]
-                  # urls[0].loc = 'https://www.google.com'
+                  urls = [urls[0]] if options.test
+                  urls = [urls[0]]
 
+                  console.log U.format 'Total URL: {0}', [String(urls.length).green]
                   urlsfn = (url, callback) ->
                     url = url.loc
                     Q()
@@ -117,5 +117,6 @@ exports.crawleSitemap = (program, messages, regexs) ->
 
       .fail (err) ->
         console.log err.message.red if err
+        console.log err.stack
         process.exit 1
       .done()
