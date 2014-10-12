@@ -36,3 +36,33 @@ describe 'test command config:crawle', ->
       assert.equal shell.exec("node bin/fantomas crawle:sitemap -T").code, 0
       shell.rm('-rf', config)
       done()
+
+  it 'use cache memory url', (done) ->
+    nconf.argv().env().file {file: config}
+
+    nconf.set 'environment', "development"
+    nconf.set 'port', 3000
+    nconf.set 'storage', "memory"
+    nconf.set 'sitemaps', ['http://jimmyfairly.com/sitemap.xml']
+    nconf.set 'APIKey', "VWC1I0uyU"
+
+    nconf.save (err) ->
+      assert.equal shell.exec("node bin/fantomas crawle:url http://www.jimmyfairly.com/fr/homme.html -T").code, 0
+      shell.rm('-rf', config)
+      done()
+
+  it 'use cache redis url', (done) ->
+    nconf.argv().env().file {file: config}
+
+    nconf.set 'environment', "development"
+    nconf.set 'port', 3000
+    nconf.set 'storage', "redis"
+    nconf.set 'sitemaps', ['http://jimmyfairly.com/sitemap.xml']
+    nconf.set 'APIKey', "VWC1I0uyU"
+    nconf.set 'redisPort', 6379
+    nconf.set 'redisHost', "localhost"
+
+    nconf.save (err) ->
+      assert.equal shell.exec("node bin/fantomas crawle:url http://www.jimmyfairly.com/fr/homme.html -T").code, 0
+      shell.rm('-rf', config)
+      done()
