@@ -14,7 +14,7 @@ _ = require 'lodash'
 _.str = require 'underscore.string'
 
 
-exports.crawleSitemap = (program, messages, regexs) ->
+exports.sitemap = (program, messages, regexs) ->
   program
     .command 'crawle:sitemap'
     .description 'Load, parse sitemaps and add into storage engine'
@@ -25,11 +25,11 @@ exports.crawleSitemap = (program, messages, regexs) ->
       colors.mode = 'none' if options.nocolors
       console.log 'Init crawling.'.green
       config = path.resolve('./config/locale_test.json') if options.test
-      nconf.argv().env().file {file: config}
 
       Q()
       .then ->
         deferred = Q.defer()
+        nconf.argv().env().file {file: config}
         sitemaps = nconf.get 'sitemaps'
 
         sitemapsfn = (sitemap, callback) ->
@@ -91,6 +91,7 @@ exports.crawleSitemap = (program, messages, regexs) ->
             sdeferred.promise
 
           .then (results)->
+            nconf.argv().env().file {file: config}
             storageName = nconf.get 'storage'
             storage = storageBase.get storageName
             storage.set result.url, result.html for result in results when result isnt null
@@ -110,6 +111,7 @@ exports.crawleSitemap = (program, messages, regexs) ->
         deferred.promise
 
       .then ->
+        nconf.argv().env().file {file: config}
         s = nconf.get 'storage'
         storageBase.get(s).close() if storageBase.get(s).close
         console.log 'Crawling finish.'.green
@@ -120,3 +122,58 @@ exports.crawleSitemap = (program, messages, regexs) ->
         console.log err.stack
         process.exit 1
       .done()
+
+exports.url = (program, messages, regexs) ->
+  program
+    .command 'crawle:url <url>'
+    .description 'Load, parse url and add into storage engine'
+    .option '-T, --test', 'Active test hook'
+    .option '-C, --nocolors', 'Disable colors'
+    .action (url, options) ->
+      time = new Date()
+      colors.mode = 'none' if options.nocolors
+      console.log 'Init crawling.'.green
+      config = path.resolve('./config/locale_test.json') if options.test
+
+      if String(url).match regexs.url
+        Q()
+        .then ->
+          deferred = Q.defer()
+          console.log U.format 'Fetch URL: {0}...', [url]
+          phantom.create '--load-images=no', '--local-to-remote-url-access=yes', (ph) ->
+            ph.createPage (page) ->
+              page.open url, (status) ->
+                if status is 'success'
+                  page.evaluate (-> document.getElementsByTagName('html')[0].innerHTML), (result) ->
+                    ph.exit()
+                    deferred.resolve result
+                else
+                  ph.exit()
+                  deferred.reject(U.format('{0} crawling: {1}', ['X'.bold, url]))
+          deferred.promise
+
+        .then (html)->
+          deferred = Q.defer()
+          nconf.argv().env().file {file: config}
+          storage = storageBase.get nconf.get 'storage'
+          storage.set url, html, deferred.makeNodeResolver()
+          deferred.promise
+
+        .then ->
+          nconf.argv().env().file {file: config}
+          s = nconf.get 'storage'
+          console.log U.format('{0} Data inserted in {1} storage', ['✓'.bold.magenta, s])
+          storageBase.get(s).close() if storageBase.get(s).close
+          console.log 'Crawling finish.'.green
+          console.log U.format('Time processing ({0}s).', [(new Date() - time)/ 1000])
+
+        .fail (err) ->
+          if err instanceof Error
+            console.log err.message.red
+            console.log err.stack
+          else
+            console.log err.red
+        .done()
+      else
+        console.log messages.url.red
+        process.exit 1
